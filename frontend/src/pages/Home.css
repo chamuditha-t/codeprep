@@ -1,0 +1,538 @@
+/* Modern Clean Home Page */
+.modern-home-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    position: relative;
+}
+
+/* Hero Section with Visible Background */
+.hero-section {
+    padding-top: 100px;
+    position: relative;
+    overflow: hidden;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 100%);
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.code-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.6;
+}
+
+.gradient-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    animation: floatParticle 15s infinite linear;
+    opacity: 0.3;
+}
+
+@keyframes floatParticle {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.3;
+    }
+
+    25% {
+        transform: translateY(-20px) translateX(20px);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translateY(-40px) translateX(0);
+        opacity: 0.3;
+    }
+
+    75% {
+        transform: translateY(-20px) translateX(-20px);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.3;
+    }
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Action Primary Button */
+.btn-action-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 14px 28px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+
+.btn-action-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+}
+
+.btn-action-primary:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
+}
+
+.btn-action-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s;
+}
+
+.btn-action-primary:hover::before {
+    left: 100%;
+}
+
+Action Outline Button
+.btn-action-outline {
+    border: 2px solid #6366f1;
+    color: #6366f1;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 14px 28px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.btn-action-outline:hover {
+    background: #6366f1;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
+}
+
+.btn-action-outline:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.1);
+}
+
+/* Company Problems Button */
+.btn-company-problems {
+    background: linear-gradient(135deg, #10b981 0%, #0ea5e9 100%);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 14px 32px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+}
+
+.btn-company-problems:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+}
+
+.btn-company-problems:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+}
+
+.btn-company-problems::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s;
+}
+
+.btn-company-problems:hover::before {
+    left: 100%;
+}
+
+/* Popup Features - Interactive Style */
+.popup-features-container {
+    position: relative;
+}
+
+.popup-feature-card {
+    background: white;
+    border: 2px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.popup-feature-card:hover {
+    transform: translateY(-8px);
+    border-color: #6366f1;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.popup-feature-card.active {
+    border-color: #6366f1;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1);
+}
+
+.popup-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background: rgba(99, 102, 241, 0.05);
+    border: 2px solid rgba(99, 102, 241, 0.1);
+    transition: all 0.3s ease;
+}
+
+.popup-feature-card:hover .popup-icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.popup-feature-card.active .popup-icon-wrapper {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: #6366f1;
+    transform: scale(1.1);
+}
+
+.popup-details {
+    margin-top: 1rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.popup-feature-card:hover .popup-details,
+.popup-feature-card.active .popup-details {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Active Popup Content */
+.active-popup-content {
+    border: 2px solid #6366f1;
+    animation: popupSlide 0.5s ease-out;
+}
+
+@keyframes popupSlide {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.popup-active-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 3px solid rgba(99, 102, 241, 0.2);
+}
+
+/* Footer */
+.footer-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cursor pointer for clickable divs */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Accessible focus styles */
+.popup-feature-card:focus {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+/* Footer link styles */
+.footer-link {
+    color: rgba(255, 255, 255, 0.6) !important;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    background: none;
+    border: none;
+    text-align: left;
+    width: 100%;
+}
+
+.footer-link:hover {
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-decoration: underline;
+}
+
+/* Social link buttons */
+.social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    color: white;
+    border-color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure all buttons have proper focus */
+.btn:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* Modern Company Logo Design */
+.company-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #f1f5f9;
+}
+
+.company-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: #6366f1;
+}
+
+.company-logo-container {
+    width: 90px;
+    height: 90px;
+    position: relative;
+}
+
+.company-logo-outer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.company-logo-inner {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.company-card:hover .company-logo-inner {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.company-initial {
+    font-size: 28px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: 700;
+}
+
+.company-logo-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    opacity: 0.1;
+    filter: blur(10px);
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.company-card:hover .company-logo-glow {
+    opacity: 0.3;
+    width: 100px;
+    height: 100px;
+    filter: blur(15px);
+}
+
+/* Optional: Add subtle pulse animation */
+@keyframes logoPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.company-logo-inner {
+    animation: logoPulse 4s ease-in-out infinite;
+}
+
+.company-card:hover .company-logo-inner {
+    animation: none;
+}
+
+/* ========== NEW ADDITIONS ========== */
+
+/* 1. Carousel Dots */
+.feature-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 1.5rem;
+}
+
+.feature-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.feature-dot:hover {
+    background-color: #bdbdbd;
+    transform: scale(1.2);
+}
+
+.feature-dot.active {
+    background-color: var(--bs-primary);
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px rgba(var(--bs-primary-rgb), 0.2);
+}
+
+/* Smooth Floating Animation for Badge */
+@keyframes smoothFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px); /* Approximately 1cm */
+    }
+}
+
+.floating-badge {
+    animation: smoothFloat 3s ease-in-out infinite;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Rocket icon with separate animation */
+@keyframes rocketFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-4px) rotate(-5deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-4px) rotate(5deg);
+    }
+}
+
+.floating-rocket {
+    animation: rocketFloat 3s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Feature icon wrapper without background */
+.feature-icon-wrapper {
+    padding: 8px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Feature icon styling without background */
+.feature-icon-wrapper .text-primary,
+.feature-icon-wrapper .text-success,
+.feature-icon-wrapper .text-info,
+.feature-icon-wrapper .text-warning {
+    /* Icons will use their natural colors without background */
+}
