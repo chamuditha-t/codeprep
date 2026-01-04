@@ -25,6 +25,7 @@ public class signinServlet extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         resp.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
@@ -32,6 +33,7 @@ public class signinServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
@@ -61,12 +63,18 @@ public class signinServlet extends HttpServlet {
             criteria.add(criterion);
             criteria.add(criterion2);
 
+            User user1 = (User)criteria.list().get(0);
+
             if(criteria.list().isEmpty()){
                 responseObject.addProperty("status", "false");
                 responseObject.addProperty("message", "Invalid Credentials!");
             }else {
+
                 HttpSession session = req.getSession();
-                session.setAttribute("user", email);
+                session.setAttribute("user",user1 );
+
+                System.out.println("session Id"+session.getId());
+
                 responseObject.addProperty("status", "true");
                 responseObject.addProperty("message", "You have been logged in!");
                 s.close();

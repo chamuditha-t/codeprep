@@ -114,16 +114,18 @@ export function Home() {
     // Auto-rotate features
     useEffect(() => {
         checkSession();
-        const interval = setInterval(() => {
-            setActiveFeature((prev) => (prev + 1) % features.length);
-        }, 4000);
-        return () => clearInterval(interval);
+        // const interval = setInterval(() => {
+        //     setActiveFeature((prev) => (prev + 1) % features.length);
+        // }, 4000);
+        // return () => clearInterval(interval);
 
     });
 
+
+
     const checkSession = async () => {
         try {
-            const res = await fetch("http://localhost:8080/session-user", {
+            const res = await fetch("http://localhost:8080/backend_war_exploded/sessionUser", {
                 credentials: "include"
             });
             if (res.ok) {
