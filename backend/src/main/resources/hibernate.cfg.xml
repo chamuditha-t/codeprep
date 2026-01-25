@@ -1,6 +1,6 @@
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
         <!-- Database connection settings -->
@@ -20,7 +20,18 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
 
         <!-- Add annotated classes -->
+        <mapping class="com.chamu.entity.Content"/>
+        <mapping class="com.chamu.entity.Difficulty"/>
+        <mapping class="com.chamu.entity.Language"/>
+        <mapping class="com.chamu.entity.Module"/>
+        <mapping class="com.chamu.entity.Phase"/>
+        <mapping class="com.chamu.entity.PhaseOrder"/>
+        <mapping class="com.chamu.entity.Problem"/>
+        <mapping class="com.chamu.entity.Solution"/>
+        <mapping class="com.chamu.entity.Status"/>
+        <mapping class="com.chamu.entity.TestCase"/>
         <mapping class="com.chamu.entity.User"/>
+        <mapping class="com.chamu.entity.UserEnrollment"/>
 
     </session-factory>
 </hibernate-configuration>

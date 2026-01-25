@@ -26,12 +26,19 @@
         }
 
         @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            Session s = HibernateUtil.getSessionFactory().openSession();
+            s.beginTransaction();
+        }
+
+        @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
             resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
             resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
 
+            System.out.println("Awa");
             Gson gson = new Gson();
             JsonObject responseObject = new JsonObject();
 

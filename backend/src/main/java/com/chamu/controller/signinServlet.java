@@ -2,20 +2,18 @@ package com.chamu.controller;
 
 import com.chamu.entity.User;
 import com.chamu.util.HibernateUtil;
+import com.chamu.util.TokenUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/login")
 public class signinServlet extends HttpServlet {
@@ -31,57 +29,62 @@ public class signinServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // CORS headers
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
         resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
         Gson gson = new Gson();
         JsonObject responseObject = new JsonObject();
 
-        Session s = HibernateUtil.getSessionFactory().openSession();
-        JsonObject user = gson.fromJson(req.getReader(), JsonObject.class);
+        Session s = null;
+        try {
+            s = HibernateUtil.getSessionFactory().openSession();
+            JsonObject user = gson.fromJson(req.getReader(), JsonObject.class);
 
-        String email = user.get("email").getAsString();
-        String password = user.get("password").getAsString();
+            String email = user.get("email").getAsString();
+            String password = user.get("password").getAsString();
 
-        if (email.isEmpty()) {
-            responseObject.addProperty("status", "false");
-            responseObject.addProperty("message", "Please Enter Email!");
-        } else if (password.isEmpty()) {
-            responseObject.addProperty("status", "false");
-            responseObject.addProperty("message", "Please Enter Password!");
-        } else {
-            s.beginTransaction();
+            if (email.isEmpty()) {
+                responseObject.addProperty("status", false);
+                responseObject.addProperty("message", "Please Enter Email!");
+            } else if (password.isEmpty()) {
+                responseObject.addProperty("status", false);
+                responseObject.addProperty("message", "Please Enter Password!");
+            } else {
+                Criteria criteria = s.createCriteria(User.class);
+                criteria.add(Restrictions.eq("email", email));
+                criteria.add(Restrictions.eq("password", password));
 
-            Criteria criteria =  s.createCriteria(User.class);
+                List<User> userList = criteria.list();
 
-            Criterion criterion = Restrictions.eq("email", email);
-            Criterion criterion2 = Restrictions.eq("password", password);
+                if (userList.isEmpty()) {
+                    responseObject.addProperty("status", false);
+                    responseObject.addProperty("message", "Invalid Credentials!");
+                } else {
+                    User u = userList.get(0);
 
-            criteria.add(criterion);
-            criteria.add(criterion2);
+                    String token = TokenUtil.generateToken(u);
 
-            User user1 = (User)criteria.list().get(0);
-
-            if(criteria.list().isEmpty()){
-                responseObject.addProperty("status", "false");
-                responseObject.addProperty("message", "Invalid Credentials!");
-            }else {
-
-                HttpSession session = req.getSession();
-                session.setAttribute("user",user1 );
-
-                System.out.println("session Id"+session.getId());
-
-                responseObject.addProperty("status", "true");
-                responseObject.addProperty("message", "You have been logged in!");
+                    responseObject.addProperty("status", true);
+                    responseObject.addProperty("message", "You have been logged in!");
+                    responseObject.addProperty("token", token);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObject.addProperty("status", false);
+            responseObject.addProperty("message", "Server error: " + e.getMessage());
+        } finally {
+            if (s != null) {
                 s.close();
             }
         }
-        String json = gson.toJson(responseObject);
-        resp.setContentType("application/json");
-        resp.getWriter().write(json);
+
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getWriter().write(gson.toJson(responseObject));
     }
 }
