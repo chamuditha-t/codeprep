@@ -34,6 +34,7 @@ import './Home.css';
 export function Home() {
 
     const [user, setUser] = useState(null);
+    const [userName, setUserName] = useState(null);
     const [activeFeature, setActiveFeature] = useState(0);
     const [activePopup, setActivePopup] = useState(0);
 
@@ -126,19 +127,31 @@ export function Home() {
     const checkSession = async () => {
         try {
             const res = await fetch("http://localhost:8080/backend_war_exploded/sessionUser", {
-                credentials: "include"
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                }
             });
+
             if (res.ok) {
-                const email = await res.text();
-                setUser(email);
-                console.log("User Found" + email);
+                const json = await res.json();
+                if (json.status) {
+                    const email = json.email;
+                    const name = json.name;
+                    setUser(email);
+                    setUserName(name);
+                    console.log("User Found " + email);
+                } else {
+                    console.log("User Not Found");
+                    setUser(null);
+                }
             } else {
                 setUser(null);
-                console.log("No user found")
+                console.log("No user found");
             }
         } catch (err) {
             setUser(null);
-            console.log("Connection error");
+            console.log("Connection error", err);
         }
     };
     //Navigate
@@ -186,7 +199,7 @@ export function Home() {
                             <div className="d-flex gap-2 align-items-center">
                                 {user ? (
                                     <>
-                                        <span className="fw-semibold">Hi, {user}</span>
+                                        <span className="fw-semibold">Hi, {userName}</span>
                                         <button
                                             className="btn btn-outline-danger btn-sm"
                                         // onClick={handleLogout}
@@ -582,7 +595,7 @@ export function Home() {
                                                 <Button
                                                     variant="outline-primary"
                                                     className="w-100 mt-3 btn-action-outline"
-                                                    onClick={() => handleNavigation('learning-path')}
+                                                // onClick={() => handleNavigation('learning-path')}
                                                 >
                                                     Continue Path
                                                     <ArrowRight className="ms-2" />

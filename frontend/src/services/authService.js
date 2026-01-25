@@ -37,6 +37,7 @@ export async function loginUser(userData) {
 
         if (json.status) {
             alert(json.message);
+            localStorage.setItem("token", json.token);
             window.location.href = "http://localhost:3000/"
         } else {
             alert(json.message+"?");
