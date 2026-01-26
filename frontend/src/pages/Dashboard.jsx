@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Modal, ProgressBar, Alert, Form, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { moveToProblem } from '../services/moveToProblem';
+// import { moveToProblem } from '../services/moveToProblem';
 import {
     CodeSlash,
     Cpu,
@@ -44,290 +46,34 @@ import {
 
 // Import language logos using the correct method
 import { FaPython, FaJava, FaJsSquare } from 'react-icons/fa';
-import { SiCplusplus } from 'react-icons/si';
+import { SiCplusplus, SiOutline } from 'react-icons/si';
 import { FaCuttlefish } from 'react-icons/fa';
 
 import styled from 'styled-components';
 
-// Complete task list as file structure (moved to top)
-const fileStructure = {
+// Default file structure (fallback)
+const defaultFileStructure = {
     name: "beginner-journey",
     type: "root",
     children: [
         {
-            name: "Phase 1: Arrays & Strings Basics",
+            name: "Phase 1: Basic Programming Fundamentals",
             type: "phase",
             id: "phase1",
-            problems: 35,
+            problems: 12,
             description: "Master the fundamentals",
             color: "#4A6FFF",
             icon: <Book />,
             children: [
                 {
-                    name: "Easy Arrays (15 problems)",
+                    name: "Variables & Data Types (4 problems)",
                     type: "module",
-                    problems: 15,
+                    problems: 4,
                     children: [
-                        { name: "Two Sum", type: "problem", difficulty: "easy", id: "p1-1" },
-                        { name: "Find Maximum in Array", type: "problem", difficulty: "easy", id: "p1-2" },
-                        { name: "Find Minimum in Array", type: "problem", difficulty: "easy", id: "p1-3" },
-                        { name: "Reverse an Array", type: "problem", difficulty: "easy", id: "p1-4" },
-                        { name: "Check if Array is Sorted", type: "problem", difficulty: "easy", id: "p1-5" },
-                        { name: "Remove Duplicates from Sorted Array", type: "problem", difficulty: "easy", id: "p1-6" },
-                        { name: "Find Second Largest Element", type: "problem", difficulty: "easy", id: "p1-7" },
-                        { name: "Move Zeros to End", type: "problem", difficulty: "easy", id: "p1-8" },
-                        { name: "Missing Number in Array", type: "problem", difficulty: "easy", id: "p1-9" },
-                        { name: "Find Single Number", type: "problem", difficulty: "easy", id: "p1-10" },
-                        { name: "Merge Two Sorted Arrays", type: "problem", difficulty: "easy", id: "p1-11" },
-                        { name: "Intersection of Two Arrays", type: "problem", difficulty: "easy", id: "p1-12" },
-                        { name: "Union of Two Arrays", type: "problem", difficulty: "easy", id: "p1-13" },
-                        { name: "Rotate Array by K positions", type: "problem", difficulty: "easy", id: "p1-14" },
-                        { name: "Check if Array is Palindrome", type: "problem", difficulty: "easy", id: "p1-15" }
-                    ]
-                },
-                {
-                    name: "Easy Strings (15 problems)",
-                    type: "module",
-                    problems: 15,
-                    children: [
-                        { name: "Reverse a String", type: "problem", difficulty: "easy", id: "p1-16" },
-                        { name: "Check if String is Palindrome", type: "problem", difficulty: "easy", id: "p1-17" },
-                        { name: "Count Vowels in String", type: "problem", difficulty: "easy", id: "p1-18" },
-                        { name: "Count Consonants in String", type: "problem", difficulty: "easy", id: "p1-19" },
-                        { name: "First Unique Character in String", type: "problem", difficulty: "easy", id: "p1-20" },
-                        { name: "Check if Two Strings are Anagrams", type: "problem", difficulty: "easy", id: "p1-21" },
-                        { name: "Remove Spaces from String", type: "problem", difficulty: "easy", id: "p1-22" },
-                        { name: "Count Words in String", type: "problem", difficulty: "easy", id: "p1-23" },
-                        { name: "Convert String to Uppercase", type: "problem", difficulty: "easy", id: "p1-24" },
-                        { name: "Convert String to Lowercase", type: "problem", difficulty: "easy", id: "p1-25" },
-                        { name: "Check if String Contains Only Digits", type: "problem", difficulty: "easy", id: "p1-26" },
-                        { name: "Find Length of String", type: "problem", difficulty: "easy", id: "p1-27" },
-                        { name: "Compare Two Strings", type: "problem", difficulty: "easy", id: "p1-28" },
-                        { name: "Count Occurrences of Character", type: "problem", difficulty: "easy", id: "p1-29" },
-                        { name: "Remove Duplicate Characters", type: "problem", difficulty: "easy", id: "p1-30" }
-                    ]
-                },
-                {
-                    name: "Mixed Easy (5 problems)",
-                    type: "module",
-                    problems: 5,
-                    children: [
-                        { name: "Valid Parentheses", type: "problem", difficulty: "easy", id: "p1-31" },
-                        { name: "Longest Common Prefix", type: "problem", difficulty: "easy", id: "p1-32" },
-                        { name: "Roman to Integer", type: "problem", difficulty: "easy", id: "p1-33" },
-                        { name: "Plus One", type: "problem", difficulty: "easy", id: "p1-34" },
-                        { name: "Pascal's Triangle", type: "problem", difficulty: "easy", id: "p1-35" }
-                    ]
-                }
-            ]
-        },
-        {
-            name: "Phase 2: Basic Data Structures",
-            type: "phase",
-            id: "phase2",
-            problems: 40,
-            description: "Stacks, Queues, Linked Lists",
-            color: "#00C9A7",
-            icon: <Cpu />,
-            children: [
-                {
-                    name: "Stack Problems (10 problems)",
-                    type: "module",
-                    problems: 10,
-                    children: [
-                        { name: "Implement Stack using Array", type: "problem", difficulty: "medium", id: "p2-1" },
-                        { name: "Implement Stack using Linked List", type: "problem", difficulty: "medium", id: "p2-2" },
-                        { name: "Valid Parentheses", type: "problem", difficulty: "medium", id: "p2-3" },
-                        { name: "Next Greater Element", type: "problem", difficulty: "medium", id: "p2-4" },
-                        { name: "Min Stack", type: "problem", difficulty: "medium", id: "p2-5" },
-                        { name: "Evaluate Postfix Expression", type: "problem", difficulty: "medium", id: "p2-6" },
-                        { name: "Infix to Postfix Conversion", type: "problem", difficulty: "medium", id: "p2-7" },
-                        { name: "Reverse String using Stack", type: "problem", difficulty: "medium", id: "p2-8" },
-                        { name: "Check Balanced Brackets", type: "problem", difficulty: "medium", id: "p2-9" },
-                        { name: "Stack with Get Middle Element", type: "problem", difficulty: "medium", id: "p2-10" }
-                    ]
-                },
-                {
-                    name: "Queue Problems (10 problems)",
-                    type: "module",
-                    problems: 10,
-                    children: [
-                        { name: "Implement Queue using Array", type: "problem", difficulty: "medium", id: "p2-11" },
-                        { name: "Implement Queue using Linked List", type: "problem", difficulty: "medium", id: "p2-12" },
-                        { name: "Implement Stack using Two Queues", type: "problem", difficulty: "medium", id: "p2-13" },
-                        { name: "Implement Queue using Two Stacks", type: "problem", difficulty: "medium", id: "p2-14" },
-                        { name: "Circular Queue Implementation", type: "problem", difficulty: "medium", id: "p2-15" },
-                        { name: "First Non-Repeating Character", type: "problem", difficulty: "medium", id: "p2-16" },
-                        { name: "Generate Binary Numbers", type: "problem", difficulty: "medium", id: "p2-17" },
-                        { name: "Reverse First K Elements of Queue", type: "problem", difficulty: "medium", id: "p2-18" },
-                        { name: "Check if Queue is Palindrome", type: "problem", difficulty: "medium", id: "p2-19" },
-                        { name: "Priority Queue", type: "problem", difficulty: "medium", id: "p2-20" }
-                    ]
-                },
-                {
-                    name: "Linked List Problems (20 problems)",
-                    type: "module",
-                    problems: 20,
-                    children: [
-                        { name: "Create a Linked List Node", type: "problem", difficulty: "medium", id: "p2-21" },
-                        { name: "Insert at Beginning", type: "problem", difficulty: "medium", id: "p2-22" },
-                        { name: "Insert at End", type: "problem", difficulty: "medium", id: "p2-23" },
-                        { name: "Insert at Position", type: "problem", difficulty: "medium", id: "p2-24" },
-                        { name: "Delete from Beginning", type: "problem", difficulty: "medium", id: "p2-25" },
-                        { name: "Delete from End", type: "problem", difficulty: "medium", id: "p2-26" },
-                        { name: "Delete at Position", type: "problem", difficulty: "medium", id: "p2-27" },
-                        { name: "Reverse a Linked List", type: "problem", difficulty: "medium", id: "p2-28" },
-                        { name: "Find Middle of Linked List", type: "problem", difficulty: "medium", id: "p2-29" },
-                        { name: "Detect Cycle in Linked List", type: "problem", difficulty: "medium", id: "p2-30" },
-                        { name: "Remove Duplicates from Sorted List", type: "problem", difficulty: "medium", id: "p2-31" },
-                        { name: "Merge Two Sorted Lists", type: "problem", difficulty: "medium", id: "p2-32" },
-                        { name: "Remove Nth Node from End", type: "problem", difficulty: "medium", id: "p2-33" },
-                        { name: "Check if Linked List is Palindrome", type: "problem", difficulty: "medium", id: "p2-34" },
-                        { name: "Intersection of Two Linked Lists", type: "problem", difficulty: "medium", id: "p2-35" },
-                        { name: "Add Two Numbers", type: "problem", difficulty: "medium", id: "p2-36" },
-                        { name: "Rotate Linked List", type: "problem", difficulty: "medium", id: "p2-37" },
-                        { name: "Clone Linked List with Random Pointer", type: "problem", difficulty: "medium", id: "p2-38" },
-                        { name: "Flatten a Linked List", type: "problem", difficulty: "medium", id: "p2-39" },
-                        { name: "Swap Nodes in Pairs", type: "problem", difficulty: "medium", id: "p2-40" }
-                    ]
-                }
-            ]
-        },
-        {
-            name: "Phase 3: Searching & Sorting",
-            type: "phase",
-            id: "phase3",
-            problems: 35,
-            description: "Essential algorithms",
-            color: "#FFB800",
-            icon: <Search />,
-            children: [
-                {
-                    name: "Binary Search (10 problems)",
-                    type: "module",
-                    problems: 10,
-                    children: [
-                        { name: "Binary Search (iterative)", type: "problem", difficulty: "medium", id: "p3-1" },
-                        { name: "Binary Search (recursive)", type: "problem", difficulty: "medium", id: "p3-2" },
-                        { name: "First Occurrence in Sorted Array", type: "problem", difficulty: "medium", id: "p3-3" },
-                        { name: "Last Occurrence in Sorted Array", type: "problem", difficulty: "medium", id: "p3-4" },
-                        { name: "Count Occurrences in Sorted Array", type: "problem", difficulty: "medium", id: "p3-5" },
-                        { name: "Search in Rotated Sorted Array", type: "problem", difficulty: "medium", id: "p3-6" },
-                        { name: "Find Peak Element", type: "problem", difficulty: "medium", id: "p3-7" },
-                        { name: "Search Insert Position", type: "problem", difficulty: "medium", id: "p3-8" },
-                        { name: "Find Minimum in Rotated Sorted Array", type: "problem", difficulty: "medium", id: "p3-9" },
-                        { name: "Square Root using Binary Search", type: "problem", difficulty: "medium", id: "p3-10" }
-                    ]
-                },
-                {
-                    name: "Sorting Algorithms (15 problems)",
-                    type: "module",
-                    problems: 15,
-                    children: [
-                        { name: "Bubble Sort", type: "problem", difficulty: "medium", id: "p3-11" },
-                        { name: "Selection Sort", type: "problem", difficulty: "medium", id: "p3-12" },
-                        { name: "Insertion Sort", type: "problem", difficulty: "medium", id: "p3-13" },
-                        { name: "Merge Sort", type: "problem", difficulty: "medium", id: "p3-14" },
-                        { name: "Quick Sort", type: "problem", difficulty: "medium", id: "p3-15" },
-                        { name: "Counting Sort", type: "problem", difficulty: "medium", id: "p3-16" },
-                        { name: "Heap Sort", type: "problem", difficulty: "medium", id: "p3-17" },
-                        { name: "Sort Array by Parity", type: "problem", difficulty: "medium", id: "p3-18" },
-                        { name: "Sort Colors", type: "problem", difficulty: "medium", id: "p3-19" },
-                        { name: "Merge Intervals", type: "problem", difficulty: "medium", id: "p3-20" },
-                        { name: "Insert Interval", type: "problem", difficulty: "medium", id: "p3-21" },
-                        { name: "Meeting Rooms", type: "problem", difficulty: "medium", id: "p3-22" },
-                        { name: "Largest Number", type: "problem", difficulty: "medium", id: "p3-23" },
-                        { name: "Kth Largest Element", type: "problem", difficulty: "medium", id: "p3-24" },
-                        { name: "Top K Frequent Elements", type: "problem", difficulty: "medium", id: "p3-25" }
-                    ]
-                },
-                {
-                    name: "Two Pointer Technique (10 problems)",
-                    type: "module",
-                    problems: 10,
-                    children: [
-                        { name: "Two Sum (sorted array)", type: "problem", difficulty: "medium", id: "p3-26" },
-                        { name: "Three Sum", type: "problem", difficulty: "medium", id: "p3-27" },
-                        { name: "Four Sum", type: "problem", difficulty: "medium", id: "p3-28" },
-                        { name: "Container With Most Water", type: "problem", difficulty: "medium", id: "p3-29" },
-                        { name: "Remove Duplicates from Sorted Array II", type: "problem", difficulty: "medium", id: "p3-30" },
-                        { name: "Move Zeroes", type: "problem", difficulty: "medium", id: "p3-31" },
-                        { name: "Valid Palindrome", type: "problem", difficulty: "medium", id: "p3-32" },
-                        { name: "Reverse Words in String", type: "problem", difficulty: "medium", id: "p3-33" },
-                        { name: "Trapping Rain Water", type: "problem", difficulty: "hard", id: "p3-34" },
-                        { name: "Sort Array by Parity II", type: "problem", difficulty: "medium", id: "p3-35" }
-                    ]
-                }
-            ]
-        },
-        {
-            name: "Phase 4: Hash Tables & Basics of Trees",
-            type: "phase",
-            id: "phase4",
-            problems: 40,
-            description: "Advanced fundamentals",
-            color: "#FF6B6B",
-            icon: <Bullseye />,
-            children: [
-                {
-                    name: "Hash Tables / HashMaps (15 problems)",
-                    type: "module",
-                    problems: 15,
-                    children: [
-                        { name: "Contains Duplicate", type: "problem", difficulty: "easy", id: "p4-1" },
-                        { name: "Valid Anagram", type: "problem", difficulty: "easy", id: "p4-2" },
-                        { name: "Two Sum (using HashMap)", type: "problem", difficulty: "easy", id: "p4-3" },
-                        { name: "Group Anagrams", type: "problem", difficulty: "medium", id: "p4-4" },
-                        { name: "Intersection of Two Arrays II", type: "problem", difficulty: "easy", id: "p4-5" },
-                        { name: "Happy Number", type: "problem", difficulty: "easy", id: "p4-6" },
-                        { name: "Isomorphic Strings", type: "problem", difficulty: "medium", id: "p4-7" },
-                        { name: "Word Pattern", type: "problem", difficulty: "easy", id: "p4-8" },
-                        { name: "First Unique Character", type: "problem", difficulty: "easy", id: "p4-9" },
-                        { name: "Longest Substring Without Repeating Characters", type: "problem", difficulty: "medium", id: "p4-10" },
-                        { name: "Subarray Sum Equals K", type: "problem", difficulty: "medium", id: "p4-11" },
-                        { name: "Continuous Subarray Sum", type: "problem", difficulty: "medium", id: "p4-12" },
-                        { name: "Find All Anagrams in String", type: "problem", difficulty: "medium", id: "p4-13" },
-                        { name: "Minimum Window Substring", type: "problem", difficulty: "hard", id: "p4-14" },
-                        { name: "Longest Consecutive Sequence", type: "problem", difficulty: "medium", id: "p4-15" }
-                    ]
-                },
-                {
-                    name: "Basic Tree Problems (15 problems)",
-                    type: "module",
-                    problems: 15,
-                    children: [
-                        { name: "Binary Tree Node Structure", type: "problem", difficulty: "easy", id: "p4-16" },
-                        { name: "Insert into Binary Search Tree", type: "problem", difficulty: "medium", id: "p4-17" },
-                        { name: "Search in Binary Search Tree", type: "problem", difficulty: "medium", id: "p4-18" },
-                        { name: "Delete from Binary Search Tree", type: "problem", difficulty: "medium", id: "p4-19" },
-                        { name: "Inorder Traversal (iterative)", type: "problem", difficulty: "medium", id: "p4-20" },
-                        { name: "Preorder Traversal (iterative)", type: "problem", difficulty: "medium", id: "p4-21" },
-                        { name: "Postorder Traversal (iterative)", type: "problem", difficulty: "medium", id: "p4-22" },
-                        { name: "Level Order Traversal", type: "problem", difficulty: "medium", id: "p4-23" },
-                        { name: "Maximum Depth of Binary Tree", type: "problem", difficulty: "easy", id: "p4-24" },
-                        { name: "Minimum Depth of Binary Tree", type: "problem", difficulty: "easy", id: "p4-25" },
-                        { name: "Symmetric Tree", type: "problem", difficulty: "easy", id: "p4-26" },
-                        { name: "Invert Binary Tree", type: "problem", difficulty: "easy", id: "p4-27" },
-                        { name: "Path Sum", type: "problem", difficulty: "easy", id: "p4-28" },
-                        { name: "Binary Tree Paths", type: "problem", difficulty: "easy", id: "p4-29" },
-                        { name: "Same Tree", type: "problem", difficulty: "easy", id: "p4-30" }
-                    ]
-                },
-                {
-                    name: "Basic Recursion (10 problems)",
-                    type: "module",
-                    problems: 10,
-                    children: [
-                        { name: "Factorial", type: "problem", difficulty: "easy", id: "p4-31" },
-                        { name: "Fibonacci Number", type: "problem", difficulty: "easy", id: "p4-32" },
-                        { name: "Power of Number", type: "problem", difficulty: "easy", id: "p4-33" },
-                        { name: "Sum of Natural Numbers", type: "problem", difficulty: "easy", id: "p4-34" },
-                        { name: "Reverse a String (recursive)", type: "problem", difficulty: "easy", id: "p4-35" },
-                        { name: "Check Palindrome (recursive)", type: "problem", difficulty: "easy", id: "p4-36" },
-                        { name: "Sum of Array (recursive)", type: "problem", difficulty: "easy", id: "p4-37" },
-                        { name: "Print 1 to N (recursive)", type: "problem", difficulty: "easy", id: "p4-38" },
-                        { name: "Tower of Hanoi", type: "problem", difficulty: "medium", id: "p4-39" },
-                        { name: "Generate Parentheses", type: "problem", difficulty: "medium", id: "p4-40" }
+                        { name: "Write a program that prints \"Hello, World!\" to the console.\n\nThis is your first program!", type: "problem", difficulty: "easy", id: "p1-13" },
+                        { name: "Declare variables of different data types:\n- Integer\n- Float\n- String\n- Boolean\n\nPrint all variables.", type: "problem", difficulty: "easy", id: "p1-14" },
+                        { name: "Swap two variables without using a third variable.\nInput: Two integers a and b\nOutput: Swapped values", type: "problem", difficulty: "easy", id: "p1-15" },
+                        { name: "Perform type conversions:\n1. String to Integer\n2. Integer to Float\n3. Float to String\n\nInput: String \"123\", Integer 456, Float 78.9\nOutput: Converted values with types", type: "problem", difficulty: "easy", id: "p1-16" }
                     ]
                 }
             ]
@@ -335,9 +81,99 @@ const fileStructure = {
     ]
 };
 
-// Introduction paragraphs (also moved to top)
+// Transformation function to convert API response to fileStructure format
+const transformApiResponse = (apiData) => {
+    if (!apiData || !apiData.phases || !Array.isArray(apiData.phases)) {
+        return defaultFileStructure; // Fallback to default structure
+    }
+
+    // Define phase colors
+    const phaseColors = [
+        "#4A6FFF", // Phase 1 - Blue
+        "#00C9A7", // Phase 2 - Teal
+        "#FFB800", // Phase 3 - Orange
+        "#FF6B6B", // Phase 4 - Red
+        "#9D4EDD", // Phase 5 - Purple
+        "#20C997", // Phase 6 - Green
+    ];
+
+    // Define phase icons
+    const phaseIcons = [
+        <Book />,     // Phase 1
+        <Cpu />,      // Phase 2
+        <Search />,   // Phase 3
+        <Bullseye />, // Phase 4
+        <CodeSlash />, // Phase 5
+        <GraphUp />,  // Phase 6
+    ];
+
+    // Define difficulty mapping
+    const difficultyMap = {
+        1: "easy",
+        2: "medium",
+        3: "hard"
+    };
+
+    // Transform each phase
+    const transformedPhases = apiData.phases.map((phase, index) => {
+        let totalProblems = 0;
+
+        // Transform modules
+        const transformedModules = phase.modules.map(module => {
+            // Transform problems
+            const transformedProblems = module.problems.map(problem => {
+                return {
+                    name: problem.name,
+                    type: "problem",
+                    difficulty: difficultyMap[problem.difficultyId] || "easy",
+                    id: `p${phase.id}-${problem.id}`
+                };
+            });
+
+            totalProblems += module.problems.length;
+
+            return {
+                name: `${module.name} (${module.problems.length} problems)`,
+                type: "module",
+                problems: module.problems.length,
+                children: transformedProblems
+            };
+        });
+
+        // Get phase description based on name
+        const getPhaseDescription = (phaseName) => {
+            const descriptions = {
+                "Basic Programming Fundamentals": "Master the fundamentals of programming",
+                "Control Flow": "Learn conditionals and loops",
+                "Functions & Methods": "Master modular programming",
+                "Basic Data Structures": "Introduction to data structures",
+                "Object-Oriented Basics": "Learn OOP concepts"
+            };
+            return descriptions[phaseName] || "Advanced programming concepts";
+        };
+
+        return {
+            name: `Phase ${phase.id}: ${phase.name}`,
+            type: "phase",
+            id: `phase${phase.id}`,
+            problems: totalProblems,
+            description: getPhaseDescription(phase.name),
+            color: phaseColors[index] || "#4A6FFF",
+            icon: phaseIcons[index] || <Book />,
+            children: transformedModules
+        };
+    });
+
+    return {
+        name: "beginner-journey",
+        type: "root",
+        children: transformedPhases
+    };
+};
+
+// Introduction paragraphs
 const introduction = {
-    overview: "Welcome to the Beginner's Journey – a carefully crafted 150-problem learning path designed specifically for 1st and 2nd year Computer Science students. This comprehensive program transforms beginners into confident problem-solvers through structured, incremental learning.",
+    overview: "Welcome to the Beginner's Journey – a carefully crafted learning path designed specifically for 1st and 2nd year Computer Science students. This comprehensive program transforms beginners into confident problem-solvers through structured, incremental learning.",
     benefits: [
         "Master essential data structures and algorithms from ground up",
         "Build strong problem-solving intuition through curated practice",
@@ -348,18 +184,7 @@ const introduction = {
     methodology: "Our pedagogical approach follows the 'Learn-Practice-Apply' cycle. Each phase introduces new concepts through carefully selected problems that build upon previous knowledge. The path progresses from basic arrays to complex data structures, ensuring solid fundamentals."
 };
 
-// Stats (moved to top)
-const stats = {
-    totalProblems: 150,
-    totalPhases: 4,
-    totalModules: 12,
-    enrolledStudents: 2543,
-    completionRate: '89%',
-    avgPlacement: '78%',
-    avgTime: '14 weeks'
-};
-
-// Languages (moved to top)
+// Languages
 const languages = [
     { id: 'python', name: 'Python', color: '#3776AB', logo: <FaPython />, description: 'Recommended for beginners' },
     { id: 'javascript', name: 'JavaScript', color: '#F7DF1E', logo: <FaJsSquare />, description: 'Web development focus' },
@@ -367,7 +192,7 @@ const languages = [
     { id: 'cpp', name: 'C++', color: '#00599C', logo: <FaCuttlefish />, description: 'Performance critical' }
 ];
 
-// Recent achievements (moved to top)
+// Recent achievements
 const recentAchievements = [
     { id: 1, type: 'problem', name: 'Two Sum', time: '2 hours ago', phase: 'Phase 1', icon: <FileEarmarkCode className="text-primary" /> },
     { id: 2, type: 'module', name: 'Easy Arrays', time: '1 day ago', progress: '15/15 problems', icon: <FileEarmarkText className="text-success" /> },
@@ -494,6 +319,21 @@ export function Dashboard() {
     const [completedProblems, setCompletedProblems] = useState(new Set());
     const [selectedPhase, setSelectedPhase] = useState(null);
     const [showLanguageSelection, setShowLanguageSelection] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [checkingUser, setCheckingUser] = useState(true);
+
+    // Dynamic states
+    const [dynamicFileStructure, setDynamicFileStructure] = useState(defaultFileStructure);
+    const [stats, setStats] = useState({
+        totalProblems: 150,
+        totalPhases: 4,
+        totalModules: 12,
+        enrolledStudents: 2543,
+        completionRate: '89%',
+        avgPlacement: '78%',
+        avgTime: '14 weeks'
+    });
+
     const [userStats, setUserStats] = useState({
         totalSolved: 0,
         phaseProgress: {},
@@ -501,9 +341,66 @@ export function Dashboard() {
         accuracy: 0,
         estimatedCompletion: '14 weeks'
     });
-    const [loading, setLoading] = useState(true);
-    const [checkingUser, setCheckingUser] = useState(true);
-    const [userProgressData, setUserProgressData] = useState(null);
+
+    // Function to fetch data from API
+    const getAllData = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/backend_war_exploded/getData", {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                const json = await response.json();
+                if (json.status) {
+                    console.log("API Response:", json);
+                    // Transform the API response
+                    const transformedStructure = transformApiResponse(json);
+                    console.log("Transformed Structure:", transformedStructure);
+                    return transformedStructure;
+                } else {
+                    console.log("API returned false status");
+                    return defaultFileStructure;
+                }
+            } else {
+                console.log("Failed to fetch data");
+                return defaultFileStructure;
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            return defaultFileStructure;
+        }
+    }
+
+    // Fetch data on component mount
+    useEffect(() => {
+        const fetchData = async () => {
+            const transformedData = await getAllData();
+            setDynamicFileStructure(transformedData);
+
+            // Calculate stats from transformed data
+            const totalProblems = transformedData.children.reduce((sum, phase) =>
+                sum + phase.problems, 0
+            );
+
+            setStats(prev => ({
+                ...prev,
+                totalProblems: totalProblems,
+                totalPhases: transformedData.children.length,
+                totalModules: transformedData.children.reduce((sum, phase) =>
+                    sum + phase.children.length, 0
+                )
+            }));
+
+            // Expand first phase by default
+            if (transformedData.children.length > 0) {
+                setExpandedFolders([transformedData.children[0].id]);
+            }
+
+            setLoading(false);
+        };
+
+        fetchData();
+    }, []);
 
     // Calculate progress
     const calculateProgress = () => {
@@ -513,7 +410,7 @@ export function Dashboard() {
 
         // Calculate phase progress
         const phaseProgress = {};
-        fileStructure.children.forEach(phase => {
+        dynamicFileStructure.children.forEach(phase => {
             const phaseProblems = getAllProblems(phase);
             const solvedInPhase = phaseProblems.filter(p => completedProblems.has(p.id)).length;
             phaseProgress[phase.id] = {
@@ -536,16 +433,16 @@ export function Dashboard() {
         return newStats;
     };
 
-    // Check user session and enrollment status
-    useEffect(() => {
-        checkUserAndEnrollment();
-    }, []);
-
     useEffect(() => {
         if (enrolled && completedProblems.size > 0) {
             calculateProgress();
         }
     }, [completedProblems, enrolled]);
+
+    // Check user session and enrollment status
+    useEffect(() => {
+        checkUserAndEnrollment();
+    }, []);
 
     const checkUserAndEnrollment = async () => {
         setCheckingUser(true);
@@ -619,7 +516,6 @@ export function Dashboard() {
             setUserId(null);
         } finally {
             setCheckingUser(false);
-            setLoading(false);
         }
     };
 
@@ -662,19 +558,21 @@ export function Dashboard() {
                     body: JSON.stringify({
                         email: userId,
                         language: selectedLanguage,
-                        phaseId: 1 
+                        phaseId: 1
                     })
                 });
 
                 if (enrollResponse.ok) {
                     const result = await enrollResponse.json();
-                    
+
                     console.log(result);
                     if (result.status === "true") {
                         setEnrolled(true);
                         setShowEnrollModal(false);
 
-                        setExpandedFolders(['phase1']);
+                        if (dynamicFileStructure.children.length > 0) {
+                            setExpandedFolders([dynamicFileStructure.children[0].id]);
+                        }
 
                         setCompletedProblems(new Set());
                         setUserStats({
@@ -767,6 +665,16 @@ export function Dashboard() {
             );
         });
     };
+
+    // Show loading spinner while fetching data
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <Spinner animation="border" variant="primary" />
+                <span className="ms-3">Loading learning path...</span>
+            </div>
+        );
+    }
 
     // Show loading spinner while checking user
     if (checkingUser) {
@@ -891,12 +799,12 @@ export function Dashboard() {
                                         <Bullseye className="me-3 text-primary" />
                                         Phase Progress
                                     </h5>
-                                    {fileStructure.children.map(phase => {
+                                    {dynamicFileStructure.children.map(phase => {
                                         const progress = userStats.phaseProgress[phase.id] || { percentage: 0, solved: 0, total: phase.problems };
                                         return (
                                             <div key={phase.id} className="mb-3">
                                                 <div className="d-flex justify-content-between mb-1">
-                                                    <small>{phase.name}</small>
+                                                    <small>{phase.name.replace(/^Phase \d+: /, '')}</small>
                                                     <small>{progress.solved}/{progress.total}</small>
                                                 </div>
                                                 <ProgressBar
@@ -933,7 +841,7 @@ export function Dashboard() {
                                 backgroundColor: '#f8f9fa',
                                 borderRadius: '8px'
                             }}>
-                                {renderFileStructure(fileStructure.children)}
+                                {renderFileStructure(dynamicFileStructure.children)}
                             </div>
                         </Card.Body>
                     </Card>
@@ -952,29 +860,36 @@ export function Dashboard() {
                                             <Lightbulb className="me-3 mt-1" />
                                             <div>
                                                 <h6 className="fw-bold mb-2">
-                                                    {totalSolved === 0 ? 'Start with Phase 1: Arrays & Strings Basics' :
-                                                        totalSolved < 35 ? 'Continue with Phase 1' :
-                                                            totalSolved < 75 ? 'Move to Phase 2: Data Structures' :
-                                                                totalSolved < 110 ? 'Progress to Phase 3: Searching & Sorting' :
-                                                                    'Complete Phase 4: Advanced Fundamentals'}
+                                                    {totalSolved === 0 ? `Start with ${dynamicFileStructure.children[0]?.name || 'Phase 1'}` :
+                                                        totalSolved < 35 ? 'Continue with your current phase' :
+                                                            totalSolved < 75 ? 'Move to next phase' :
+                                                                totalSolved < 110 ? 'Progress to advanced topics' :
+                                                                    'Complete the learning path'}
                                                 </h6>
                                                 <p className="mb-0">
-                                                    {totalSolved === 0 ? 'Begin with "Two Sum" to build your foundation in array manipulation.' :
-                                                        totalSolved < 35 ? 'Keep building momentum with easy array and string problems.' :
-                                                            totalSolved < 75 ? 'Start learning data structures with stack and queue implementations.' :
-                                                                totalSolved < 110 ? 'Master essential algorithms like binary search and sorting.' :
-                                                                    'Finish strong with hash tables and tree fundamentals.'}
+                                                    {totalSolved === 0 ? 'Begin with the first problem to build your foundation.' :
+                                                        totalSolved < 35 ? 'Keep building momentum with your current problems.' :
+                                                            totalSolved < 75 ? 'Start learning more complex concepts.' :
+                                                                totalSolved < 110 ? 'Master essential algorithms and patterns.' :
+                                                                    'Finish strong with advanced fundamentals.'}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="text-center mt-4">
-                                        <Link to="/problem/phase1/1">
-                                            <Button variant="primary" size="lg" className="px-5">
-                                                <Play className="me-2" />
-                                                {totalSolved === 0 ? 'Begin Learning Path' : 'Continue Solving'}
-                                            </Button>
-                                        </Link>
+
+                                        <Button
+                                            variant="primary"
+                                            size="lg"
+                                            className="px-5"
+                                            onClick={() => {
+                                                moveToProblem();
+                                            }}
+                                        >
+                                            <Play className="me-2" />
+                                            {totalSolved === 0 ? 'Begin Learning Path' : 'Continue Solving'}
+                                        </Button>
+
                                     </div>
                                 </Card.Body>
                             </Card>
@@ -1049,11 +964,11 @@ export function Dashboard() {
                                     For 1st-2nd Year CS Students
                                 </Badge>
                                 <h1 className="display-4 fw-bold mb-4">
-                                    Beginner's Journey: 150 Problems
+                                    Beginner's Journey: {stats.totalProblems} Problems
                                 </h1>
                                 <p className="lead mb-4" style={{ fontSize: '1.25rem' }}>
                                     A complete structured path to build strong coding fundamentals.
-                                    Master arrays, strings, data structures, algorithms, and problem-solving patterns.
+                                    Master programming concepts, data structures, algorithms, and problem-solving patterns.
                                 </p>
                                 <div className="d-flex flex-wrap gap-3 mb-4">
                                     <div className="d-flex align-items-center">
@@ -1231,34 +1146,21 @@ export function Dashboard() {
                                     </div>
                                 </Col>
                                 <Col md={8}>
-                                    <div className="mb-3">
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <small>Phase 1: Arrays & Strings</small>
-                                            <small>0/35 problems</small>
+                                    {dynamicFileStructure.children.map((phase, index) => (
+                                        <div key={phase.id} className="mb-3">
+                                            <div className="d-flex justify-content-between mb-1">
+                                                <small>{phase.name}</small>
+                                                <small>0/{phase.problems} problems</small>
+                                            </div>
+                                            <ProgressBar
+                                                now={0}
+                                                variant={phase.color === '#4A6FFF' ? 'primary' :
+                                                    phase.color === '#00C9A7' ? 'success' :
+                                                        phase.color === '#FFB800' ? 'warning' : 'danger'}
+                                                style={{ height: '8px' }}
+                                            />
                                         </div>
-                                        <ProgressBar now={0} variant="primary" style={{ height: '8px' }} />
-                                    </div>
-                                    <div className="mb-3">
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <small>Phase 2: Data Structures</small>
-                                            <small>0/40 problems</small>
-                                        </div>
-                                        <ProgressBar now={0} variant="success" style={{ height: '8px' }} />
-                                    </div>
-                                    <div className="mb-3">
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <small>Phase 3: Algorithms</small>
-                                            <small>0/35 problems</small>
-                                        </div>
-                                        <ProgressBar now={0} variant="warning" style={{ height: '8px' }} />
-                                    </div>
-                                    <div>
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <small>Phase 4: Advanced Fundamentals</small>
-                                            <small>0/40 problems</small>
-                                        </div>
-                                        <ProgressBar now={0} variant="danger" style={{ height: '8px' }} />
-                                    </div>
+                                    ))}
                                 </Col>
                             </Row>
                         </Card.Body>
@@ -1268,7 +1170,7 @@ export function Dashboard() {
                     <div className="mb-5">
                         <div className="text-center mb-5">
                             <h2 className="fw-bold mb-3">Complete Task List Structure</h2>
-                            <p className="text-muted">Explore all 150 problems organized in a file structure</p>
+                            <p className="text-muted">Explore all {stats.totalProblems} problems organized in a file structure</p>
                         </div>
 
                         <Card className="border-0 shadow-sm">
@@ -1294,7 +1196,7 @@ export function Dashboard() {
                                     borderRadius: '8px',
                                     border: '1px solid #dee2e6'
                                 }}>
-                                    {renderFileStructure(fileStructure.children)}
+                                    {renderFileStructure(dynamicFileStructure.children)}
                                 </div>
 
                                 <div className="mt-4 d-flex flex-wrap gap-3">
@@ -1390,7 +1292,7 @@ export function Dashboard() {
                             }}>
                                 <Book size={48} />
                             </div>
-                            <h4 className="fw-bold mb-2">Beginner's Journey: 150 Problems</h4>
+                            <h4 className="fw-bold mb-2">Beginner's Journey: {stats.totalProblems} Problems</h4>
                             <p className="text-muted">Confirm your enrollment to start learning</p>
                         </div>
 
@@ -1422,7 +1324,7 @@ export function Dashboard() {
                                 <div>
                                     <h6 className="fw-bold mb-1">What to expect after enrollment:</h6>
                                     <ul className="mb-0 ps-3">
-                                        <li>Access to all 150 problems with solutions</li>
+                                        <li>Access to all {stats.totalProblems} problems with solutions</li>
                                         <li>Personalized progress tracking dashboard</li>
                                         <li>Community support and discussions</li>
                                         <li>Certificate upon completion</li>
