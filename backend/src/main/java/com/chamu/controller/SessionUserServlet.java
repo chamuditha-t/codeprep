@@ -46,7 +46,7 @@ public class SessionUserServlet extends HttpServlet {
         String token = authHeader.replace("Bearer ", "");
 
         // 🔹 3. Validate token (THIS REPLACES getSession)
-        User user = TokenUtil   .validateToken(token);
+        User user = TokenUtil.validateToken(token);
 
         if (user == null) {
             responseObject.addProperty("status", false);

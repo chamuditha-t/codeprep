@@ -20,6 +20,17 @@ public class Problem implements Serializable {
     @JoinColumn(name = "module_id", nullable = false)
     private Module module;
 
+    @Column (name = "title", nullable = false)
+    private String title;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
     public int getId() {
         return id;
     }
