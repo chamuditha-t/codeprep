@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Alert, Tab, Nav, Form, ProgressBar, Spinner, Modal } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
+import { moveToProblem } from '../services/moveToProblem';
 import {
     Play,
     CheckCircle,
@@ -547,6 +548,8 @@ export function ProblemPage() {
     const { phase, problemId } = useParams();
     const navigate = useNavigate();
     const [code, setCode] = useState('');
+    const [inputText, setInputText] = useState("");
+    const [outputText, setOutputText] = useState("");
     const [output, setOutput] = useState('');
     const [showSolution, setShowSolution] = useState(false);
     const [showHints, setShowHints] = useState(false);
@@ -568,254 +571,33 @@ export function ProblemPage() {
     const [showConfetti, setShowConfetti] = useState(false);
     const [lineCount, setLineCount] = useState(1);
 
-    // Enhanced problem data
-    const problem = {
-        id: parseInt(problemId),
-        title: "Two Sum",
-        difficulty: "Easy",
-        difficultyLevel: 1,
-        description: `## Problem Statement
-Given an array of integers **nums** and an integer **target**, return indices of the two numbers such that they add up to target.
 
-### 📋 Requirements
-- Each input has exactly one solution
-- You may not use the same element twice
-- Return answer in any order
 
-### 🎯 Example Walkthrough
-Let's understand with examples:`,
-        examples: [
-            {
-                title: "Example 1",
-                input: "nums = [2,7,11,15], target = 9",
-                output: "[0,1]",
-                explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]."
-            },
-            {
-                title: "Example 2",
-                input: "nums = [3,2,4], target = 6",
-                output: "[1,2]",
-                explanation: "Because nums[1] + nums[2] == 6, we return [1, 2]."
-            }
-        ],
-        constraints: [
-            "2 ≤ nums.length ≤ 10⁴",
-            "-10⁴ ≤ nums[i] ≤ 10⁴",
-            "-10⁴ ≤ target ≤ 10⁴",
-            "Only one valid answer exists"
-        ],
-        topics: ["Array", "Hash Table", "Two Pointers"],
-        hints: [
-            "A really brute force way would be to search for all pairs of numbers.",
-            "So, if we fix one of the numbers, say x, we have to scan the entire array to find the next number y = target - x.",
-            "We can reduce the look up time from O(n) to O(1) by trading space for speed."
-        ],
-        solution: {
-            python: `def twoSum(nums, target):
-    """
-    Find two indices such that their values sum to target.
-    
-    Args:
-        nums: List of integers
-        target: Target sum
-        
-    Returns:
-        List of two indices
-    """
-    # Create a dictionary to store number-index pairs
-    num_map = {}
-    
-    # Iterate through the array
-    for i, num in enumerate(nums):
-        # Calculate complement
-        complement = target - num
-        
-        # Check if complement exists in dictionary
-        if complement in num_map:
-            # Return indices if found
-            return [num_map[complement], i]
-        
-        # Store current number and its index
-        num_map[num] = i
-    
-    # Return empty list if no solution (shouldn't happen per problem)
-    return []`,
-            javascript: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
-    // Create a Map to store number-index pairs
-    const map = new Map();
-    
-    // Iterate through the array
-    for (let i = 0; i < nums.length; i++) {
-        // Calculate complement
-        const complement = target - nums[i];
-        
-        // Check if complement exists in map
-        if (map.has(complement)) {
-            // Return indices if found
-            return [map.get(complement), i];
-        }
-        
-        // Store current number and its index
-        map.set(nums[i], i);
-    }
-    
-    // Return empty array if no solution
-    return [];
-}`,
-            java: `import java.util.HashMap;
-import java.util.Map;
 
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        // Create a HashMap to store number-index pairs
-        Map<Integer, Integer> map = new HashMap<>();
-        
-        // Iterate through the array
-        for (int i = 0; i < nums.length; i++) {
-            // Calculate complement
-            int complement = target - nums[i];
-            
-            // Check if complement exists in map
-            if (map.containsKey(complement)) {
-                // Return indices if found
-                return new int[] { map.get(complement), i };
-            }
-            
-            // Store current number and its index
-            map.put(nums[i], i);
-        }
-        
-        // Return empty array if no solution
-        return new int[0];
-    }
-}`,
-            cpp: `#include <vector>
-#include <unordered_map>
-using namespace std;
-
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        // Create an unordered_map to store number-index pairs
-        unordered_map<int, int> map;
-        
-        // Iterate through the vector
-        for (int i = 0; i < nums.size(); i++) {
-            // Calculate complement
-            int complement = target - nums[i];
-            
-            // Check if complement exists in map
-            if (map.find(complement) != map.end()) {
-                // Return indices if found
-                return {map[complement], i};
-            }
-            
-            // Store current number and its index
-            map[nums[i]] = i;
-        }
-        
-        // Return empty vector if no solution
-        return {};
-    }
-};`
-        },
-        testCases: [
-            {
-                id: 1,
-                input: '[2,7,11,15], 9',
-                expected: '[0,1]',
-                explanation: 'Basic test case'
-            },
-            {
-                id: 2,
-                input: '[3,2,4], 6',
-                expected: '[1,2]',
-                explanation: 'Normal case with different numbers'
-            }
-        ],
-        timeComplexity: "O(n)",
-        spaceComplexity: "O(n)",
-        acceptance: "52.3%",
-        likes: "12.5K",
-        totalSubmissions: "2.4M",
-        frequency: "90%",
-        relatedProblems: ["3Sum", "4Sum", "Two Sum II"]
-    };
-
-    // Default code templates
-    const defaultCodes = {
-        python: `def twoSum(nums, target):
-    """
-    Find two indices such that their values sum to target.
-    
-    Args:
-        nums: List of integers
-        target: Target sum
-        
-    Returns:
-        List of two indices
-    """
-    # Your code here
-    # Hint: Use a dictionary to store number-index pairs
-    
-    pass`,
-        javascript: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
-    // Your code here
-    // Hint: Use a Map to store number-index pairs
-    
-}`,
-        java: `import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        // Your code here
-        // Hint: Use a HashMap to store number-index pairs
-        
-        return new int[0];
-    }
-}`,
-        cpp: `#include <vector>
-#include <unordered_map>
-using namespace std;
-
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        // Your code here
-        // Hint: Use unordered_map to store number-index pairs
-        
-        return {};
-    }
-};`
-    };
-
-    // Initialize code
-    useEffect(() => {
-        if (!code) {
-            const initialCode = defaultCodes[language];
-            setCode(initialCode);
-            // Count lines in initial code
-            const lines = initialCode.split('\n').length;
-            setLineCount(lines);
-        }
-    }, [language]);
+    // // Initialize code
+    // useEffect(() => {
+    //     if (!code) {
+    //         const initialCode = defaultCodes[language];
+    //         setCode(initialCode);
+    //         // Count lines in initial code
+    //         const lines = initialCode.split('\n').length;
+    //         setLineCount(lines);
+    //     }
+    // }, [language]);
 
     // Update line count when code changes
     useEffect(() => {
         const lines = code.split('\n').length;
         setLineCount(lines);
     }, [code]);
+
+    useEffect(() => {
+        moveToProblem().then(json => {
+            setCode(json.content.content);
+            setOutputText(json.content.output);
+        });
+    }, []);
+
 
     // Handle editor mount
     const handleEditorDidMount = (editor, monaco) => {
@@ -850,7 +632,7 @@ public:
                 'editorBracketMatch.background': '#1e293b',
                 'editorBracketMatch.border': '#6366f1'
             }
-            
+
         });
         monaco.editor.setTheme('myTheme');
 
@@ -890,29 +672,29 @@ public:
         setProgress(0);
 
         // Enhanced simulation with realistic feedback
-        const totalTests = problem.testCases.length;
+        // const totalTests = problem.testCases.length;
         const results = [];
         let passedCount = 0;
 
-        for (let i = 0; i < totalTests; i++) {
-            await new Promise(resolve => setTimeout(resolve, 300));
-            setProgress(((i + 1) / totalTests) * 100);
+        // for (let i = 0; i < totalTests; i++) {
+        //     await new Promise(resolve => setTimeout(resolve, 300));
+        //     setProgress(((i + 1) / totalTests) * 100);
 
-            const passed = Math.random() > 0.2; // 80% chance of passing
-            if (passed) passedCount++;
+        //     const passed = Math.random() > 0.2; // 80% chance of passing
+        //     if (passed) passedCount++;
 
-            results.push({
-                id: i + 1,
-                input: problem.testCases[i].input,
-                expected: problem.testCases[i].expected,
-                actual: passed ? problem.testCases[i].expected : '[0,0]',
-                passed,
-                time: (Math.random() * 50 + 10).toFixed(1),
-                memory: (Math.random() * 2 + 40).toFixed(1)
-            });
+        //     results.push({
+        //         id: i + 1,
+        //         input: problem.testCases[i].input,
+        //         expected: problem.testCases[i].expected,
+        //         actual: passed ? problem.testCases[i].expected : '[0,0]',
+        //         passed,
+        //         time: (Math.random() * 50 + 10).toFixed(1),
+        //         memory: (Math.random() * 2 + 40).toFixed(1)
+        //     });
 
-            setTestResults([...results]);
-        }
+        //     setTestResults([...results]);
+        // }
 
         const totalTime = results.reduce((sum, r) => sum + parseFloat(r.time), 0).toFixed(1);
         const avgMemory = (results.reduce((sum, r) => sum + parseFloat(r.memory), 0) / results.length).toFixed(1);
@@ -921,13 +703,13 @@ public:
         setMemoryUsage(avgMemory);
         setIsRunning(false);
 
-        const successRate = Math.round((passedCount / totalTests) * 100);
+        // const successRate = Math.round((passedCount / totalTests) * 100);
 
-        if (passedCount === totalTests) {
-            setOutput(`🎯 All Test Cases Passed!\n\n📊 Results:\n├── ✅ ${passedCount}/${totalTests} tests passed\n├── ⏱️  Total time: ${totalTime}ms\n├── 💾 Avg memory: ${avgMemory}MB\n└── 🎯 Success rate: ${successRate}%\n\n💡 Great job! Your solution is optimal.`);
-        } else {
-            setOutput(`⚠️  ${passedCount}/${totalTests} Tests Passed\n\n📊 Results:\n├── ❌ ${totalTests - passedCount} test(s) failed\n├── ⏱️  Total time: ${totalTime}ms\n├── 💾 Avg memory: ${avgMemory}MB\n└── 🎯 Success rate: ${successRate}%\n\n🔍 Check the failed test cases for debugging.`);
-        }
+        // if (passedCount === totalTests) {
+        //     setOutput(`🎯 All Test Cases Passed!\n\n📊 Results:\n├── ✅ ${passedCount}/${totalTests} tests passed\n├── ⏱️  Total time: ${totalTime}ms\n├── 💾 Avg memory: ${avgMemory}MB\n└── 🎯 Success rate: ${successRate}%\n\n💡 Great job! Your solution is optimal.`);
+        // } else {
+        //     setOutput(`⚠️  ${passedCount}/${totalTests} Tests Passed\n\n📊 Results:\n├── ❌ ${totalTests - passedCount} test(s) failed\n├── ⏱️  Total time: ${totalTime}ms\n├── 💾 Avg memory: ${avgMemory}MB\n└── 🎯 Success rate: ${successRate}%\n\n🔍 Check the failed test cases for debugging.`);
+        // }
     };
 
     const handleSubmit = () => {
@@ -968,7 +750,7 @@ public:
     };
 
     const handleReset = () => {
-        setCode(defaultCodes[language]);
+        // setCode(defaultCodes[language]);
         setOutput('');
         setIsCompleted(false);
         setExecutionTime(null);
@@ -991,7 +773,7 @@ public:
 
     const handleLanguageChange = (lang) => {
         setLanguage(lang);
-        setCode(defaultCodes[lang]);
+        // setCode(defaultCodes[lang]);
     };
 
     const copyToClipboard = () => {
@@ -1006,8 +788,8 @@ public:
 
     const handleShare = () => {
         const shareData = {
-            title: `Solved: ${problem.title}`,
-            text: `I just solved "${problem.title}" on CodeMaster!`,
+            // title: `Solved: ${problem.title}`,
+            // text: `I just solved "${problem.title}" on CodeMaster!`,
             url: window.location.href
         };
 
@@ -1077,27 +859,11 @@ public:
 
                         <div>
                             <div className="d-flex align-items-center gap-3">
-                                <h4 className="fw-bold mb-0" style={{ color: '#1e293b' }}>
-                                    {problem.title}
-                                </h4>
-                                <NeonBadge className={problem.difficulty.toLowerCase()}>
-                                    <Bullseye className="me-2" />
-                                    {problem.difficulty}
-                                </NeonBadge>
-                            </div>
-                            <div className="d-flex align-items-center gap-3 mt-2">
-                                <small className="d-flex align-items-center text-muted">
-                                    <Clock className="me-2" size={14} />
-                                    Time: {problem.timeComplexity}
-                                </small>
-                                <small className="d-flex align-items-center text-muted">
-                                    <Memory className="me-2" size={14} />
-                                    Space: {problem.spaceComplexity}
-                                </small>
-                                <small className="d-flex align-items-center text-muted">
-                                    <GraphUpArrow className="me-2" size={14} />
-                                    {problem.acceptance} Acceptance
-                                </small>
+                                <h4 id="problemTitle" className="fw-bold mb-0" style={{ color: '#1e293b' }}></h4>
+                                {/* <NeonBadge className={problem.difficulty.toLowerCase()}> */}
+                                {/* <Bullseye className="me-2" /> */}
+                                {/* {problem.difficulty} */}
+                                {/* </NeonBadge> */}
                             </div>
                         </div>
                     </div>
@@ -1176,7 +942,7 @@ public:
                                                 </h6>
                                                 <GlassCard>
                                                     <Card.Body className="p-4">
-                                                        <div dangerouslySetInnerHTML={{ __html: problem.description.replace(/\n/g, '<br/>') }} />
+                                                        <div id='descriptionBox'></div>
                                                     </Card.Body>
                                                 </GlassCard>
                                             </div>
@@ -1187,34 +953,40 @@ public:
                                                     <Play className="me-2 text-success" />
                                                     Examples
                                                 </h6>
-                                                {problem.examples.map((example, idx) => (
-                                                    <CodeThemeCard key={idx} className="mb-4">
-                                                        <div className="code-header">
-                                                            <div className="code-title">{example.title}</div>
-                                                        </div>
-                                                        <div className="code-content">
+                                                <CodeThemeCard>
+                                                    <div className="code-header">
+                                                        <div className="code-title">Input / Output</div>
+                                                    </div>
+
+                                                    <div className="code-content">
+
+                                                        {/* Input (only if it exists) */}
+                                                        {inputText && inputText.trim() !== "" && (
                                                             <CodeInput>
                                                                 <span className="label">Input</span>
-                                                                <div className="value">{example.input}</div>
+                                                                <div className="value">
+                                                                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+                                                                        {inputText}
+                                                                    </pre>
+                                                                </div>
                                                             </CodeInput>
+                                                        )}
+
+                                                        {/* Output (only if it exists) */}
+                                                        {outputText && outputText.trim() !== "" && (
                                                             <CodeInput>
                                                                 <span className="label">Output</span>
-                                                                <div className="value">{example.output}</div>
-                                                            </CodeInput>
-                                                            {example.explanation && (
-                                                                <div className="mt-3 p-3 rounded" style={{
-                                                                    background: 'rgba(99, 102, 241, 0.1)',
-                                                                    borderLeft: '3px solid #6366f1'
-                                                                }}>
-                                                                    <div className="d-flex align-items-start">
-                                                                        <Lightbulb className="me-2 mt-1" size={14} style={{ color: '#6366f1' }} />
-                                                                        <small style={{ color: '#9dccff' }}>{example.explanation}</small>
-                                                                    </div>
+                                                                <div className="value">
+                                                                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+                                                                        {outputText}
+                                                                    </pre>
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    </CodeThemeCard>
-                                                ))}
+                                                            </CodeInput>
+                                                        )}
+
+                                                    </div>
+                                                </CodeThemeCard>
+
                                             </div>
 
                                             {/* Constraints */}
@@ -1229,7 +1001,7 @@ public:
                                                     </div>
                                                     <div className="code-content">
                                                         <div className="row g-2">
-                                                            {problem.constraints.map((constraint, idx) => (
+                                                            {/* {problem.constraints.map((constraint, idx) => (
                                                                 <Col md={6} key={idx}>
                                                                     <div className="p-3 mb-2 rounded" style={{
                                                                         background: 'rgba(99, 102, 241, 0.1)',
@@ -1250,7 +1022,7 @@ public:
                                                                         </div>
                                                                     </div>
                                                                 </Col>
-                                                            ))}
+                                                            ))} */}
                                                         </div>
                                                     </div>
                                                 </CodeThemeCard>
@@ -1263,7 +1035,7 @@ public:
                                                     Topics
                                                 </h6>
                                                 <div className="d-flex flex-wrap gap-2">
-                                                    {problem.topics.map((topic, idx) => (
+                                                    {/* {problem.topics.map((topic, idx) => (
                                                         <Badge key={idx} style={{
                                                             background: 'linear-gradient(135deg, #2a2b3d 0%, #1a1b26 100%)',
                                                             color: '#9dccff',
@@ -1275,7 +1047,7 @@ public:
                                                             <Code className="me-2" size={12} />
                                                             {topic}
                                                         </Badge>
-                                                    ))}
+                                                    ))} */}
                                                 </div>
                                             </div>
 
@@ -1311,7 +1083,7 @@ public:
 
                                                             {showHints && (
                                                                 <div className="mt-4">
-                                                                    {problem.hints.map((hint, idx) => (
+                                                                    {/* {problem.hints.map((hint, idx) => (
                                                                         <div key={idx} className="mb-3 p-3 rounded-lg" style={{
                                                                             background: 'rgba(99, 102, 241, 0.1)',
                                                                             borderLeft: '4px solid #0ea5e9'
@@ -1330,7 +1102,7 @@ public:
                                                                                 <small style={{ color: '#9dccff' }}>{hint}</small>
                                                                             </div>
                                                                         </div>
-                                                                    ))}
+                                                                    ))} */}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -1418,7 +1190,7 @@ public:
                                                 {showSolution ? (
                                                     <CodeBlock>
                                                         <code>
-                                                            {problem.solution[language]}
+                                                            {/* {problem.solution[language]} */}
                                                         </code>
                                                     </CodeBlock>
                                                 ) : (
@@ -1443,9 +1215,9 @@ public:
 
                                             <div className="row mb-4">
                                                 <Col md={4} className="text-center">
-                                                    <ProgressRing progress={problem.frequency.replace('%', '')}>
+                                                    {/* <ProgressRing progress={problem.frequency.replace('%', '')}>
                                                         <div className="progress-text">{problem.frequency}</div>
-                                                    </ProgressRing>
+                                                    </ProgressRing> */}
                                                     <div className="mt-3">
                                                         <small className="text-muted">Interview Frequency</small>
                                                     </div>
@@ -1457,21 +1229,21 @@ public:
                                                             <Col md={6}>
                                                                 <div className="mb-3">
                                                                     <small className="text-muted d-block mb-1">Acceptance Rate</small>
-                                                                    <div className="fw-bold">{problem.acceptance}</div>
+                                                                    {/* <div className="fw-bold">{problem.acceptance}</div> */}
                                                                 </div>
                                                                 <div className="mb-3">
                                                                     <small className="text-muted d-block mb-1">Total Submissions</small>
-                                                                    <div className="fw-bold">{problem.totalSubmissions}</div>
+                                                                    {/* <div className="fw-bold">{problem.totalSubmissions}</div> */}
                                                                 </div>
                                                             </Col>
                                                             <Col md={6}>
                                                                 <div className="mb-3">
                                                                     <small className="text-muted d-block mb-1">Likes</small>
-                                                                    <div className="fw-bold">{problem.likes}</div>
+                                                                    {/* <div className="fw-bold">{problem.likes}</div> */}
                                                                 </div>
                                                                 <div className="mb-3">
                                                                     <small className="text-muted d-block mb-1">Related Problems</small>
-                                                                    <div className="fw-bold">{problem.relatedProblems.length}</div>
+                                                                    {/* <div className="fw-bold">{problem.relatedProblems.length}</div> */}
                                                                 </div>
                                                             </Col>
                                                         </div>
@@ -1564,7 +1336,7 @@ public:
                     {/* Right Panel - SIMPLIFIED VERSION */}
                     <Col lg={isFullscreen ? 12 : 6}>
                         <div style={{
-                            height: 'calc(100vh - 160px)',
+                            height: '100vh',
                             display: 'flex',
                             flexDirection: 'column',
                             background: '#0f172a',
@@ -1581,24 +1353,21 @@ public:
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center'
-                            }}>
-                                <select
-                                    value={language}
-                                    onChange={(e) => handleLanguageChange(e.target.value)}
-                                    style={{
-                                        background: '#0f172a',
-                                        color: 'white',
-                                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                                        borderRadius: '8px',
-                                        padding: '8px 16px',
-                                        fontSize: '14px'
-                                    }}
-                                >
-                                    <option value="python">Python</option>
-                                    <option value="javascript">JavaScript</option>
-                                    <option value="java">Java</option>
-                                    <option value="cpp">C++</option>
-                                </select>
+                            }}><div
+                                id="language"
+                                className="form-select form-select-sm"
+                                style={{
+                                    width: '120px',
+                                    background: '#1a1b26',
+                                    color: '#9dccff',
+                                    border: '1px solid rgba(99, 102, 241, 0.3)',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '0.25rem',
+                                    display: 'inline-block'
+                                }}
+                            >
+                                    Python
+                                </div>
 
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <button

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Modal, ProgressBar, Alert, Form, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { moveToProblem } from '../services/moveToProblem';
 // import { moveToProblem } from '../services/moveToProblem';
 import {
     CodeSlash,
@@ -883,7 +882,7 @@ export function Dashboard() {
                                             size="lg"
                                             className="px-5"
                                             onClick={() => {
-                                                moveToProblem();
+                                                window.location.href = "/problem";
                                             }}
                                         >
                                             <Play className="me-2" />
