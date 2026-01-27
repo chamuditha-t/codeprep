@@ -1,9 +1,6 @@
 package com.chamu.controller;
 
-import com.chamu.entity.Problem;
-import com.chamu.entity.Status;
-import com.chamu.entity.User;
-import com.chamu.entity.UserProgress;
+import com.chamu.entity.*;
 import com.chamu.util.HibernateUtil;
 import com.chamu.util.TokenUtil;
 import com.google.gson.Gson;
@@ -109,7 +106,22 @@ public class NextProblem extends HttpServlet {
             System.out.println("Problem ID: " + nextProblem.getId());
             System.out.println("Problem Title: " + nextProblem.getTitle());
 
-            response.addProperty("problemId", nextProblem.getId());
+            Criteria criteria1 =  session.createCriteria(Content.class);
+            criteria1.add(Restrictions.eq("problem", nextProblem));
+            Content content = (Content) criteria1.list().get(0);
+            response.add("content",gson.toJsonTree(content));
+
+//            Criteria criteria2 = session.createCriteria(Solution.class);
+//            criteria2.add(Restrictions.eq("problem", nextProblem));
+//            Solution solution = (Solution) criteria2.list().get(0);
+//            response.add("solution",gson.toJsonTree(solution));
+
+            Criteria criteria3 = session.createCriteria(TestCase.class);
+            criteria3.add(Restrictions.eq("problem", nextProblem));
+            TestCase  testCase = (TestCase) criteria3.list().get(0);
+            response.add("testCase",gson.toJsonTree(testCase));
+
+            response.add("problem", gson.toJsonTree(nextProblem));
             response.addProperty("status", true);
         } else {
             System.out.println("No next problem found. Course completed.");

@@ -23,6 +23,32 @@ public class Content implements Serializable {
     @JoinColumn(name = "language_id")
     private Language language;
 
+    @Column(name = "description",nullable = false)
+    private String description;
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
+    @Column(name = "input")
+    private String input;
+
+    @Column(name = "output")
+    private String output;
+
+
     public int getId() {
         return id;
     }
@@ -54,4 +80,8 @@ public class Content implements Serializable {
     public void setLanguage(Language language) {
         this.language = language;
     }
+
+    public String getDescription() {return description;}
+
+    public void setDescription(String description) {this.description = description;}
 }
