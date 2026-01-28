@@ -35,8 +35,6 @@ public class NextProblem extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        System.out.println("=== getNextProblem API called ===");
-
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
         resp.setHeader("Access-Control-Allow-Credentials", "true");
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -48,33 +46,21 @@ public class NextProblem extends HttpServlet {
         JsonObject response = new JsonObject();
         response.addProperty("status", false);
 
-        // 🔹 TOKEN
         String authHeader = req.getHeader("Authorization");
-        System.out.println("Authorization Header: " + authHeader);
 
         String token = authHeader.replace("Bearer ", "");
         User user = TokenUtil.validateToken(token);
 
-        System.out.println("Token validated for user email: " + user.getEmail());
-
         Session session = HibernateUtil.getSessionFactory().openSession();
-        System.out.println("Hibernate session opened");
 
-        // 🔹 USER
         Criteria criteria = session.createCriteria(User.class);
         criteria.add(Restrictions.eq("email", user.getEmail()));
         User selectedUser = (User) criteria.uniqueResult();
 
-        System.out.println("Selected User ID: " + selectedUser.getId());
-
-        // 🔹 STATUS
         Criteria statusCriteria = session.createCriteria(Status.class);
         statusCriteria.add(Restrictions.eq("status", "Completed"));
         Status selectedStatus = (Status) statusCriteria.uniqueResult();
 
-        System.out.println("Selected Status: " + selectedStatus.getStatus());
-
-        // 🔹 USER PROGRESS
         Criteria progressCriteria = session.createCriteria(UserProgress.class);
         progressCriteria.add(Restrictions.eq("user", selectedUser));
         progressCriteria.add(Restrictions.eq("status", selectedStatus));
@@ -85,7 +71,6 @@ public class NextProblem extends HttpServlet {
 
         System.out.println("Last Solved Problem ID: " + lastSolvedProblemId);
 
-        // 🔹 NEXT PROBLEM
         Criteria problemCriteria = session.createCriteria(Problem.class);
 
         if (lastSolvedProblemId != null) {
@@ -111,6 +96,11 @@ public class NextProblem extends HttpServlet {
             Content content = (Content) criteria1.list().get(0);
             response.add("content",gson.toJsonTree(content));
 
+            Criteria criteria5 = session.createCriteria(UserEnrollment.class);
+            criteria5.add(Restrictions.eq("user", selectedUser));
+            UserEnrollment userEnrollment = (UserEnrollment) criteria5.list().get(0);
+            response.add("language",gson.toJsonTree(userEnrollment.getLanguage().getLanguage()));
+
 //            Criteria criteria2 = session.createCriteria(Solution.class);
 //            criteria2.add(Restrictions.eq("problem", nextProblem));
 //            Solution solution = (Solution) criteria2.list().get(0);
@@ -129,10 +119,8 @@ public class NextProblem extends HttpServlet {
         }
 
         session.close();
-        System.out.println("Hibernate session closed");
 
         resp.getWriter().write(gson.toJson(response));
-        System.out.println("=== Response sent ===");
     }
 
 }
