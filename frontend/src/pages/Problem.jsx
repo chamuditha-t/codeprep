@@ -1,8 +1,10 @@
 // pages/ProblemPage.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Alert, Tab, Nav, Form, ProgressBar, Spinner, Modal } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { moveToProblem } from '../services/moveToProblem';
+import { submitProblem } from '../services/submitProblem';
+import { runCode } from '../services/RunCode';
 import {
     Play,
     CheckCircle,
@@ -547,6 +549,7 @@ const EditorFooter = styled.div`
 export function ProblemPage() {
     const { phase, problemId } = useParams();
     const navigate = useNavigate();
+    const [isError, setIsError] = useState(false);
     const [code, setCode] = useState('');
     const [inputText, setInputText] = useState("");
     const [outputText, setOutputText] = useState("");
@@ -570,8 +573,7 @@ export function ProblemPage() {
     const [userCode, setUserCode] = useState('');
     const [showConfetti, setShowConfetti] = useState(false);
     const [lineCount, setLineCount] = useState(1);
-
-
+    const [canSubmit, setCanSubmit] = useState(false);
 
 
     // // Initialize code
@@ -661,92 +663,21 @@ export function ProblemPage() {
         });
     };
 
+    useEffect(() => {
+    }, [canSubmit]);
+
+
     const handleCodeChange = (value) => {
         setCode(value);
     };
 
     const handleRun = async () => {
-        setIsRunning(true);
-        setOutput('');
-        setTestResults([]);
-        setProgress(0);
+        const status = await runCode(
+            code,
+            document.getElementById("language").innerHTML
+        );
 
-        // Enhanced simulation with realistic feedback
-        // const totalTests = problem.testCases.length;
-        const results = [];
-        let passedCount = 0;
-
-        // for (let i = 0; i < totalTests; i++) {
-        //     await new Promise(resolve => setTimeout(resolve, 300));
-        //     setProgress(((i + 1) / totalTests) * 100);
-
-        //     const passed = Math.random() > 0.2; // 80% chance of passing
-        //     if (passed) passedCount++;
-
-        //     results.push({
-        //         id: i + 1,
-        //         input: problem.testCases[i].input,
-        //         expected: problem.testCases[i].expected,
-        //         actual: passed ? problem.testCases[i].expected : '[0,0]',
-        //         passed,
-        //         time: (Math.random() * 50 + 10).toFixed(1),
-        //         memory: (Math.random() * 2 + 40).toFixed(1)
-        //     });
-
-        //     setTestResults([...results]);
-        // }
-
-        const totalTime = results.reduce((sum, r) => sum + parseFloat(r.time), 0).toFixed(1);
-        const avgMemory = (results.reduce((sum, r) => sum + parseFloat(r.memory), 0) / results.length).toFixed(1);
-
-        setExecutionTime(totalTime);
-        setMemoryUsage(avgMemory);
-        setIsRunning(false);
-
-        // const successRate = Math.round((passedCount / totalTests) * 100);
-
-        // if (passedCount === totalTests) {
-        //     setOutput(`🎯 All Test Cases Passed!\n\n📊 Results:\n├── ✅ ${passedCount}/${totalTests} tests passed\n├── ⏱️  Total time: ${totalTime}ms\n├── 💾 Avg memory: ${avgMemory}MB\n└── 🎯 Success rate: ${successRate}%\n\n💡 Great job! Your solution is optimal.`);
-        // } else {
-        //     setOutput(`⚠️  ${passedCount}/${totalTests} Tests Passed\n\n📊 Results:\n├── ❌ ${totalTests - passedCount} test(s) failed\n├── ⏱️  Total time: ${totalTime}ms\n├── 💾 Avg memory: ${avgMemory}MB\n└── 🎯 Success rate: ${successRate}%\n\n🔍 Check the failed test cases for debugging.`);
-        // }
-    };
-
-    const handleSubmit = () => {
-        setIsRunning(true);
-        setOutput('🚀 Submitting your solution...\n\nAnalyzing code quality and performance...');
-
-        setTimeout(async () => {
-            const analysis = [
-                "✓ Code structure validated",
-                "✓ No syntax errors found",
-                "✓ Performance check passed",
-                "✓ Memory usage optimized",
-                "✓ Edge cases handled"
-            ];
-
-            let outputText = '🚀 Analyzing Submission...\n\n';
-            for (let i = 0; i < analysis.length; i++) {
-                outputText += `${analysis[i]}\n`;
-                setOutput(outputText);
-                await new Promise(resolve => setTimeout(resolve, 300));
-            }
-
-            const time = executionTime || (Math.random() * 50 + 30).toFixed(1);
-            const memory = memoryUsage || (Math.random() * 2 + 41).toFixed(1);
-            const beatsTime = Math.floor(Math.random() * 30) + 70;
-            const beatsMemory = Math.floor(Math.random() * 25) + 75;
-
-            const finalResult = `\n🎉 Congratulations! Solution Accepted\n\n🏆 Performance Metrics:\n┌─ Runtime: ${time}ms\n│  ├── Beats ${beatsTime}% of submissions\n│  └── ✅ Better than average\n├─ Memory: ${memory}MB\n│  ├── Beats ${beatsMemory}% of submissions\n│  └── ✅ Highly efficient\n└─ 🏅 Overall Score: 95/100\n\n✨ You've earned 50 XP for solving this problem!`;
-
-            setOutput(outputText + finalResult);
-            setIsCompleted(true);
-            setIsRunning(false);
-            setShowConfetti(true);
-
-            // Hide confetti after 3 seconds
-            setTimeout(() => setShowConfetti(false), 3000);
-        }, 1500);
+        setCanSubmit(status)
     };
 
     const handleReset = () => {
@@ -784,6 +715,18 @@ export function ProblemPage() {
 
     const toggleFullscreen = () => {
         setIsFullscreen(!isFullscreen);
+    };
+
+    const handleOutput = async () => {
+        const result = await runCode(code, "java", inputText);
+
+        if (result.success) {
+            setOutput(result.output || "No output");
+            setIsError(false);   // ✅ GREEN
+        } else {
+            setOutput(result.error || "Error occurred");
+            setIsError(true);    // ❌ RED
+        }
     };
 
     const handleShare = () => {
@@ -1384,14 +1327,18 @@ export function ProblemPage() {
                                         Run
                                     </button>
                                     <button
-                                        onClick={handleSubmit}
+                                        disabled={!canSubmit}
+                                        onClick={submitProblem}
                                         style={{
-                                            background: '#6366f1',
+                                            background: canSubmit ? '#6366f1' : '#475569',
                                             border: 'none',
                                             borderRadius: '8px',
                                             padding: '8px 16px',
-                                            color: 'white',
-                                            fontWeight: '600'
+                                            color: canSubmit ? 'white' : '#cbd5f5',
+                                            fontWeight: '600',
+                                            cursor: canSubmit ? 'pointer' : 'not-allowed',
+                                            opacity: canSubmit ? 1 : 0.6,
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         Submit
@@ -1451,7 +1398,14 @@ export function ProblemPage() {
                                 padding: '16px',
                                 overflow: 'auto'
                             }}>
-                                <div style={{ color: '#e2e8f0', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'pre-wrap' }}>
+                                <div
+                                    id='outputPanel'
+                                    style={{
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        whiteSpace: 'pre-wrap',
+                                        color: isError ? '#ef4444' : '#22c55e'
+                                    }}
+                                >
                                     {output || 'Run your code to see output here...'}
                                 </div>
                             </div>

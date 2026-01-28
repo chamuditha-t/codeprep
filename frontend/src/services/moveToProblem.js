@@ -15,7 +15,8 @@ export const moveToProblem = async () => {
                 console.log(json);
                 document.getElementById("descriptionBox").innerHTML = json.content.description;
                 document.getElementById("problemTitle").innerHTML = json.problem.title;
-                document.getElementById("language").innerHTML = json.content.language.language;
+                document.getElementById("language").innerHTML = json.language;
+                localStorage.setItem("problemId",json.problem.id);
                 return json;
             } else {
                 console.log("Something went wrong");
